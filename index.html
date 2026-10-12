@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Noga!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- مكتبة الألعاب النارية والقلوب المتساقطة -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* تصميم مشغل الأغاني */
+        .music-player {
+            text-align: center;
+            margin-bottom: 25px;
+            background: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .music-btn {
+            background: #ff6b81;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.4);
+        }
+
+        .music-btn:hover {
+            background: #ff4757;
+            transform: scale(1.05);
+        }
+
+        .music-info span {
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #ff6b81;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        /* عداد الصحبة */
+        .counter-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border: 2px dashed #ff6b81;
+        }
+
+        .counter-box h3 {
+            color: #ff6b81;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .counter-digits {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #444;
+        }
+
+        /* Timeline Style */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 50%;
+            width: 4px;
+            background: #ff6b81;
+            transform: translateX(50%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            padding: 20px 40px;
+            position: relative;
+            background: inherit;
+            width: 50%;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .timeline-item.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item.right {
+            left: 50%;
+        }
+
+        .timeline-item.left {
+            left: 0;
+        }
+
+        .timeline-content {
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .timeline-content img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .timeline-content h3 {
+            color: #ff6b81;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+
+        .timeline-content p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background: #fff;
+            border: 4px solid #ff6b81;
+            top: 35px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-item.right::after {
+            left: -10px;
+            right: auto;
+        }
+
+        /* --- تصميم عرض الصور المتحرك (30 صورة زي الفيديو) --- */
+        .slideshow-section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .slideshow-section h2 {
+            color: #ff6b81;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .slideshow-container {
+            position: relative;
+            max-width: 500px;
+            margin: auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            background: #000;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            animation: fadeSlide 1s ease-in-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
+        .slide-btns {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .slide-btn {
+            background: #ff6b81;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .slide-btn:hover {
+            background: #ff4757;
+            transform: scale(1.05);
+        }
+
+        /* شهادة تقدير */
+        .certificate-section {
+            background: #fff;
+            padding: 35px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 40px;
+            border: 8px double #f1c40f;
+            position: relative;
+        }
+
+        .certificate-section h2 {
+            color: #e67e22;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .certificate-section p {
+            color: #555;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .cert-badge {
+            display: inline-block;
+            background: #f39c12;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+
+        /* اللعبة التفاعلية */
+        .game-section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .game-section h2 {
+            color: #ff6b81;
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        .game-section p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .game-container-wrapper {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        #gameCanvas {
+            background: linear-gradient(to bottom, #dff9fb, #c7ecee);
+            border-radius: 12px;
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .start-btn-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            z-index: 10;
+        }
+
+        .start-btn-overlay button {
+            background: #ff6b81;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 107, 129, 0.5);
+            transition: 0.3s;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .start-btn-overlay button:hover {
+            background: #ff4757;
+            transform: scale(1.08);
+        }
+
+        .game-info {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2ed573;
+        }
+
+        /* الزر السري */
+        .secret-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .secret-btn {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+            transition: 0.3s;
+        }
+
+        .secret-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #5849be, #897fe9);
+        }
+
+        .secret-message {
+            display: none;
+            margin-top: 15px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            color: #6c5ce7;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* رسالة خاصة */
+        .message-section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .message-section h2 {
+            color: #ff6b81;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .message-section p {
+            color: #555;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .timeline::before {
+                right: 20px;
+            }
+            .timeline-item {
+                width: 100%;
+                left: 0 !important;
+                padding-right: 50px;
+                padding-left: 20px;
+            }
+            .timeline-item::after {
+                right: 11px !important;
+                left: auto !important;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- مشغل الأغاني -->
+        <div class="music-player">
+            <button class="music-btn" id="playPauseBtn" onclick="toggleMusic()">▶</button>
+            <div class="music-info">
+                <span>تشغيل الأغنية 🎵</span>
+            </div>
+            <audio id="bgMusic" loop>
+                <source src="song.mp3" type="audio/mp3">
+                متصفحك لا يدعم تشغيل الصوتيات.
+            </audio>
+        </div>
+
+        <header>
+            <h1>🎉 Happy Birthday Noga! 🎉🌸</h1>
+            <p>رحلة ذكريات من الطفولة لحد النهاردة ✨</p>
+        </header>
+
+        <!-- عداد الذكريات والصداقة -->
+        <div class="counter-box">
+            <h3>⏳ عداد أحلى سنين المعرفة والأخوة</h3>
+            <div class="counter-digits" id="friendshipCounter">جاري حساب الأيام واللحظات الجميلة...</div>
+        </div>
+
+        <!-- التايملاين (الصور الأساسية) -->
+        <div class="timeline">
+            <!-- المرحلة الأولى -->
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <img src="photo1.jpg" alt="صورة الطفولة">
+                    <h3>أول العهد بـ الدنيا (الطفولة)</h3>
+                    <p>هنا الحلاوة والشقاوة بدأت تظهر! 😍</p>
+                </div>
+            </div>
+
+            <!-- المرحلة الثانية -->
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <img src="photo2.jpg" alt="صورة مرحلة الابتدائية">
+                    <h3>أيام المدرسة والذكريات</h3>
+                    <p>الضحكة اللي مابتتغيرش والبرائة كلها. 🌸</p>
+                </div>
+            </div>
+
+            <!-- المرحلة الثالثة -->
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <img src="photo3.jpg" alt="صورة مرحلة الشباب">
+                    <h3>أحلى سنين العمر</h3>
+                    <p>الجمال والعقل بيزيدوا سنة عن سنة. ✨</p>
+                </div>
+            </div>
+
+            <!-- المرحلة الرابعة -->
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <img src="photo4.jpg" alt="صورة النهاردة">
+                    <h3>النهاردة.. عيد ميلاد السعادة!</h3>
+                    <p>كل سنة وأنتِ طيبة يا نوجا وفي أتم الصحة ودايماً منورة الدنيا. 🎂🎈</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- قسم عرض الصور المتحرك (30 صورة جاهزة زي الفيديو) --- -->
+        <div class="slideshow-section">
+            <h2>🎬 شريط ذكريات نوجا (فيديو الصور)</h2>
+            <p>الصور بتتحرك وتتغير لوحدها زي الفيديو ✨</p>
+            
+            <div class="slideshow-container">
+                <img class="slide active" src="slide1.jpg" alt="ذكريات 1">
+                <img class="slide" src="slide2.jpg" alt="ذكريات 2">
+                <img class="slide" src="slide3.jpg" alt="ذكريات 3">
+                <img class="slide" src="slide4.jpg" alt="ذكريات 4">
+                <img class="slide" src="slide5.jpg" alt="ذكريات 5">
+                <img class="slide" src="slide6.jpg" alt="ذكريات 6">
+                <img class="slide" src="slide7.jpg" alt="ذكريات 7">
+                <img class="slide" src="slide8.jpg" alt="ذكريات 8">
+                <img class="slide" src="slide9.jpg" alt="ذكريات 9">
+                <img class="slide" src="slide10.jpg" alt="ذكريات 10">
+                <img class="slide" src="slide11.jpg" alt="ذكريات 11">
+                <img class="slide" src="slide12.jpg" alt="ذكريات 12">
+                <img class="slide" src="slide13.jpg" alt="ذكريات 13">
+                <img class="slide" src="slide14.jpg" alt="ذكريات 14">
+                <img class="slide" src="slide15.jpg" alt="ذكريات 15">
+                <img class="slide" src="slide16.jpg" alt="ذكريات 16">
+                <img class="slide" src="slide17.jpg" alt="ذكريات 17">
+                <img class="slide" src="slide18.jpg" alt="ذكريات 18">
+                <img class="slide" src="slide19.jpg" alt="ذكريات 19">
+                <img class="slide" src="slide20.jpg" alt="ذكريات 20">
+                <img class="slide" src="slide21.jpg" alt="ذكريات 21">
+                <img class="slide" src="slide22.jpg" alt="ذكريات 22">
+                <img class="slide" src="slide23.jpg" alt="ذكريات 23">
+                <img class="slide" src="slide24.jpg" alt="ذكريات 24">
+                <img class="slide" src="slide25.jpg" alt="ذكريات 25">
+                <img class="slide" src="slide26.jpg" alt="ذكريات 26">
+                <img class="slide" src="slide27.jpg" alt="ذكريات 27">
+                <img class="slide" src="slide28.jpg" alt="ذكريات 28">
+                <img class="slide" src="slide29.jpg" alt="ذكريات 29">
+                <img class="slide" src="slide30.jpg" alt="ذكريات 30">
+            </div>
+
+            <div class="slide-btns">
+                <button class="slide-btn" onclick="changeSlide(-1)">❮ السابق</button>
+                <button class="slide-btn" onclick="changeSlide(1)">التالي ❯</button>
+            </div>
+        </div>
+
+        <!-- شهادة تقدير -->
+        <div class="certificate-section">
+            <h2>📜 شهادة تقدير رسمية</h2>
+            <p>تُمنح هذه الشهادة بكل احترام وتقدير إلى <strong>نوجا</strong>، نظراً لوقفاتك الجدعة وطيب أصلك اللي بيخلي كل الأيام أحلى.</p>
+            <div class="cert-badge">التقدير: امتياز مع مرتبة الشرف في الجدعنة والأخوة 👑</div>
+        </div>
+
+        <!-- اللعبة التفاعلية -->
+        <div class="game-section">
+            <h2>لعبة مغامرة الكيك 🎮</h2>
+            <p>انقزي فوق العوائق واجمعي 5 كيكات عشان تكشفي رسالة المفاجأة!</p>
+            
+            <div class="game-container-wrapper">
+                <div class="start-btn-overlay" id="startOverlay">
+                    <button onclick="startGame()">▶ ابدئي اللعبة</button>
+                </div>
+                <canvas id="gameCanvas" width="600" height="200"></canvas>
+            </div>
+            
+            <div class="game-info" id="gameInfo">الكيكات المجمعة: 0 / 5</div>
+        </div>
+
+        <!-- زر السر المفاجئ -->
+        <div class="secret-section">
+            <button class="secret-btn" onclick="revealSecret()">🎁 افتحي الهدية السرية هنا يا نوجا!</button>
+            <div class="secret-message" id="secretMsg">
+                سرّي للغاية: أنتِ شخصية محترمة جداً وغالية عندي يا نوجا، ومهما الدنيا دارت هفضل دايماً سند وقريب لكل الأوقات الحلوة! ❤️✨
+            </div>
+        </div>
+
+        <!-- رسالة خاصة ليها -->
+        <div class="message-section">
+            <h2>رسالة من القلب 💌</h2>
+            <p>
+                كل سنة وأنتِ طيبة وبخير دايماً يا نوجا! 
+                حبيت أعملك الموقع والذكريات دي بطريقة تليق بيكي عشان تفضلي فاكرة دايماً إن وجودك بيفرق كتير وبيحلي كل الأيام. 
+                بتمنالك السنة دي تكون سنة تحقيق كل أحلامك وسعادتك، ودايماً ناجحة وموفقة في كل خطوة. 
+                عيد ميلاد سعيد! ✨💖
+            </p>
+        </div>
+
+        <footer>
+            <p>Made with ❤️ specially for Noga</p>
+        </footer>
+    </div>
+
+    <script>
+        // إطلاق ألعاب نارية تلقائية أول ما الموقع يفتح للاحتفال
+        window.addEventListener('load', () => {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        });
+
+        // --- برمجة عرض الصور المتحرك (30 صورة Slideshow Auto Play) ---
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function showSlides(n) {
+            if (n >= slides.length) slideIndex = 0;
+            if (n < 0) slideIndex = slides.length - 1;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[slideIndex].classList.add('active');
+        }
+
+        function changeSlide(n) {
+            slideIndex += n;
+            showSlides(slideIndex);
+        }
+
+        // تشغيل الصور تلقائياً كل 3 ثواني زي الفيديو
+        setInterval(() => {
+            slideIndex++;
+            showSlides(slideIndex);
+        }, 3000);
+
+        // عداد الصداقة التلقائي (سنة ونصف)
+        const startDate = new Date('2025-04-12T00:00:00'); 
+        function updateCounter() {
+            const now = new Date();
+            const diff = now - startDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            
+            document.getElementById('friendshipCounter').textContent = `${days} يوماً، ${hours} ساعة، و ${minutes} دقيقة من أجمل الذكريات والأخوة! ✨`;
+        }
+        setInterval(updateCounter, 1000);
+        updateCounter();
+
+        // زر السر المفاجئ
+        function revealSecret() {
+            const msg = document.getElementById('secretMsg');
+            msg.style.display = 'block';
+            confetti({
+                particleCount: 50,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 }
+            });
+            confetti({
+                particleCount: 50,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 }
+            });
+        }
+
+        // تأثير ظهور العناصر تدريجياً في الـ Timeline
+        const items = document.querySelectorAll('.timeline-item');
+        const checkScroll = () => {
+            const triggerBottom = window.innerHeight * 0.85;
+            items.forEach(item => {
+                const itemTop = item.getBoundingClientRect().top;
+                if(itemTop < triggerBottom) {
+                    item.classList.add('show');
+                }
+            });
+        };
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('load', checkScroll);
+
+        // تشغيل وإيقاف الأغنية
+        const music = document.getElementById('bgMusic');
+        const btn = document.getElementById('playPauseBtn');
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play();
+                btn.textContent = "⏸";
+            } else {
+                music.pause();
+                btn.textContent = "▶";
+            }
+        }
+
+        // --- برمجة اللعبة التفاعلية ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameInfo = document.getElementById('gameInfo');
+        const startOverlay = document.getElementById('startOverlay');
+
+        let gameStarted = false;
+        let score = 0;
+        let gameOver = false;
+        let gameWon = false;
+
+        let player = {
+            x: 50,
+            y: 130,
+            width: 30,
+            height: 45,
+            dy: 0,
+            jumpPower: -10.5,
+            gravity: 0.55,
+            grounded: true
+        };
+
+        let obstacles = [];
+        let cakes = [];
+        let spawnCounter = 0;
+
+        function startGame() {
+            startOverlay.style.display = 'none';
+            gameStarted = true;
+            resetGame();
+        }
+
+        function resetGame() {
+            score = 0;
+            gameOver = false;
+            gameWon = false;
+            obstacles = [];
+            cakes = [];
+            player.y = 130;
+            player.dy = 0;
+            spawnCounter = 0;
+            gameInfo.textContent = "الكيكات المجمعة: 0 / 5";
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') jump();
+        });
+
+        canvas.addEventListener('click', () => {
+            jump();
+        });
+
+        function jump() {
+            if (!gameStarted) return;
+
+            if (player.grounded && !gameOver && !gameWon) {
+                player.dy = player.jumpPower;
+                player.grounded = false;
+            } else if (gameWon || gameOver) {
+                resetGame();
+            }
+        }
+
+        function update() {
+            if (!gameStarted || gameWon || gameOver) return;
+
+            player.dy += player.gravity;
+            player.y += player.dy;
+
+            if (player.y > 130) {
+                player.y = 130;
+                player.dy = 0;
+                player.grounded = true;
+            }
+
+            spawnCounter++;
+            if (spawnCounter > 90) {
+                spawnCounter = 0;
+                if (Math.random() > 0.45) {
+                    cakes.push({ x: canvas.width, y: 135, width: 28, height: 28, speed: 3.5 });
+                } else {
+                    obstacles.push({ x: canvas.width, y: 140, width: 24, height: 35, speed: 3.5 });
+                }
+            }
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= obstacles[i].speed;
+
+                if (
+                    player.x < obstacles[i].x + obstacles[i].width - 5 &&
+                    player.x + player.width > obstacles[i].x + 5 &&
+                    player.y < obstacles[i].y + obstacles[i].height &&
+                    player.y + player.height > obstacles[i].y
+                ) {
+                    gameOver = true;
+                }
+
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            for (let i = cakes.length - 1; i >= 0; i--) {
+                cakes[i].x -= cakes[i].speed;
+
+                if (
+                    player.x < cakes[i].x + cakes[i].width &&
+                    player.x + player.width > cakes[i].x &&
+                    player.y < cakes[i].y + cakes[i].height &&
+                    player.y + player.height > cakes[i].y
+                ) {
+                    cakes.splice(i, 1);
+                    score++;
+                    gameInfo.textContent = `الكيكات المجمعة: ${score} / 5`;
+
+                    if (score >= 5) {
+                        gameWon = true;
+                        confetti({
+                            particleCount: 150,
+                            spread: 100,
+                            origin: { y: 0.5 }
+                        });
+                    }
+                }
+
+                if (cakes[i].x + cakes[i].width < 0) {
+                    cakes.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff6b81';
+            ctx.fillRect(0, 175, canvas.width, 25);
+
+            ctx.fillStyle = '#ff4757';
+            ctx.fillRect(player.x, player.y + 15, player.width, 20); 
+            ctx.fillStyle = '#f19066';
+            ctx.beginPath();
+            ctx.arc(player.x + 15, player.y + 8, 10, 0, Math.PI * 2); 
+            ctx.fill();
+
+            ctx.fillStyle = '#374151';
+            obstacles.forEach(obs => {
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            });
+
+            cakes.forEach(cake => {
+                ctx.fillStyle = '#e84393';
+                ctx.fillRect(cake.x, cake.y + 12, cake.width, 16); 
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cake.x + 4, cake.y + 6, 20, 6); 
+                ctx.fillStyle = '#f1c40f';
+                ctx.fillRect(cake.x + 12, cake.y, 4, 6); 
+            });
+
+            if (gameOver) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Cairo';
+                ctx.textAlign = 'center';
+                ctx.fillText('ياااه.. خبطي في العائق يا نوجا! 😢', canvas.width / 2, 85);
+                ctx.font = '15px Cairo';
+                ctx.fillText('اضغطي هنا في أي مكان لإعادة المحاولة', canvas.width / 2, 120);
+            }
+
+            if (gameWon) {
+                ctx.fillStyle = 'rgba(255, 107, 129, 0.92)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 24px Cairo';
+                ctx.textAlign = 'center';
+                ctx.fillText('🎉 كل سنة وأنتِ طيبة يا نوجا! 🎂', canvas.width / 2, 90);
+                ctx.font = '15px Cairo';
+                ctx.fillText('مبروك خلصتي المهمة بنجاح يا متميزة! ✨', canvas.width / 2, 130);
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
